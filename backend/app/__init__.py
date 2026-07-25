@@ -14,6 +14,8 @@ from app.auth import auth_bp
 # Load authentication routes
 import app.auth.routes
 
+from app.models.token_blocklist import TokenBlocklist
+
 
 def create_app():
 
@@ -50,3 +52,15 @@ def create_app():
         }
 
     return app
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_header, jwt_payload):
+
+    jti = jwt_payload["jti"]
+
+    token = TokenBlocklist.query.filter_by(
+        jti=jti
+    ).first()
+
+    return token is not None

@@ -5,6 +5,7 @@ from app.models.campus import campus_members
 from app.models.skill import user_skills
 
 
+
 class User(db.Model):
     __tablename__ = "users"
 

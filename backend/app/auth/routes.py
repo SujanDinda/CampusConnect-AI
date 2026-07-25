@@ -11,6 +11,18 @@ from app.auth.services import (
     login_user
 )
 
+from flask_jwt_extended import (
+    jwt_required,
+    get_jwt_identity,
+    create_access_token,
+    get_jwt
+)
+
+from app.models.user import User
+
+from app.models.token_blocklist import TokenBlocklist
+from app.extensions import db
+
 
 @auth_bp.route(
     "/register",
@@ -142,4 +154,91 @@ def login():
 
         }
 
+    }), 200
+
+
+@auth_bp.route(
+    "/me",
+    methods=["GET"]
+)
+@jwt_required()
+def me():
+
+    current_user_id = get_jwt_identity()
+
+    user = User.query.get(current_user_id)
+
+    if not user:
+
+        return jsonify({
+            "status": "error",
+            "message": "User not found"
+        }), 404
+
+    roles = [
+        role.name
+        for role in user.roles
+    ]
+
+    return jsonify({
+
+        "status": "success",
+
+        "data": {
+
+            "id": user.id,
+
+            "email": user.email,
+
+            "is_active": user.is_active,
+
+            "is_verified": user.is_verified,
+
+            "roles": roles
+
+        }
+
+    }), 200
+
+
+@auth_bp.route(
+    "/refresh",
+    methods=["POST"]
+)
+@jwt_required(refresh=True)
+def refresh():
+
+    current_user = get_jwt_identity()
+
+    access_token = create_access_token(
+        identity=current_user
+    )
+
+    return jsonify({
+        "status": "success",
+        "access_token": access_token
+    }), 200
+
+
+@auth_bp.route(
+    "/logout",
+    methods=["POST"]
+)
+@jwt_required()
+def logout():
+
+    token = get_jwt()
+
+    jti = token["jti"]
+
+    blocked_token = TokenBlocklist(
+        jti=jti
+    )
+
+    db.session.add(blocked_token)
+    db.session.commit()
+
+    return jsonify({
+        "status": "success",
+        "message": "Logout successful"
     }), 200

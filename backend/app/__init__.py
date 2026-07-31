@@ -24,6 +24,10 @@ from app.skills import skills_bp
 
 import app.skills.routes
 
+from app.utils.error_handlers import (
+    register_error_handlers
+)
+
 
 def create_app():
 
@@ -57,6 +61,8 @@ def create_app():
     app.register_blueprint(
         skills_bp
     )
+
+    register_error_handlers(app)
 
 
     @app.route("/")

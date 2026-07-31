@@ -28,6 +28,9 @@ from app.utils.error_handlers import (
     register_error_handlers
 )
 
+from app.jobs import jobs_bp
+import app.jobs.routes
+
 
 def create_app():
 
@@ -60,6 +63,10 @@ def create_app():
 
     app.register_blueprint(
         skills_bp
+    )
+
+    app.register_blueprint(
+        jobs_bp
     )
 
     register_error_handlers(app)

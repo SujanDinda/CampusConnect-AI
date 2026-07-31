@@ -16,6 +16,10 @@ import app.auth.routes
 
 from app.models.token_blocklist import TokenBlocklist
 
+from app.profile import profile_bp
+
+import app.profile.routes
+
 
 def create_app():
 
@@ -41,6 +45,11 @@ def create_app():
     app.register_blueprint(
         auth_bp
     )
+
+    app.register_blueprint(
+        profile_bp
+    )
+
 
     @app.route("/")
     def home():

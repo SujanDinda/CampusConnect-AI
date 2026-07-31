@@ -20,6 +20,10 @@ from app.profile import profile_bp
 
 import app.profile.routes
 
+from app.skills import skills_bp
+
+import app.skills.routes
+
 
 def create_app():
 
@@ -48,6 +52,10 @@ def create_app():
 
     app.register_blueprint(
         profile_bp
+    )
+
+    app.register_blueprint(
+        skills_bp
     )
 
 

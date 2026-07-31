@@ -2,8 +2,7 @@ from datetime import datetime
 from app.extensions import db
 from app.models.role import user_roles
 from app.models.campus import campus_members
-from app.models.skill import user_skills
-
+from app.models.skill import UserSkill
 
 
 class User(db.Model):
@@ -59,8 +58,8 @@ class User(db.Model):
         backref="members"
     )
 
-    skills = db.relationship(
-        "Skill",
-        secondary=user_skills,
-        backref="users"
+    user_skills = db.relationship(
+        "UserSkill",
+        back_populates="user",
+        cascade="all, delete-orphan"
     )

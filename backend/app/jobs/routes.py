@@ -33,12 +33,23 @@ from app.utils.api_response import (
     error_response
 )
 
+from app.permissions.decorators import (
+    role_required,
+    roles_required
+)
+
+from app.permissions.services import (
+    is_job_owner,
+    is_application_owner
+)
+
 
 @jobs_bp.route(
     "",
     methods=["POST"]
 )
 @jwt_required()
+@role_required("CLIENT")
 def create_new_job():
 
     data = request.get_json()
@@ -94,6 +105,7 @@ def create_new_job():
     methods=["POST"]
 )
 @jwt_required()
+@role_required("ADMIN")
 def create_category():
 
     data = request.get_json()
@@ -132,7 +144,8 @@ def create_category():
     methods=["POST"]
 )
 @jwt_required()
-def create_new_company():
+@role_required("CLIENT")
+def create_company_route():
 
     current_user_id = get_jwt_identity()
 
@@ -284,7 +297,17 @@ def get_job(job_id):
     methods=["PUT"]
 )
 @jwt_required()
+@role_required("CLIENT")
 def edit_job(job_id):
+
+    current_user = get_jwt_identity()
+
+    if not is_job_owner(current_user, job_id):
+
+        return error_response(
+            message="Permission denied",
+            status_code=403
+        )
 
     data = request.get_json()
 
@@ -327,7 +350,17 @@ def edit_job(job_id):
     methods=["DELETE"]
 )
 @jwt_required()
+@role_required("CLIENT")
 def remove_job(job_id):
+
+    current_user = get_jwt_identity()
+
+    if not is_job_owner(current_user, job_id):
+
+        return error_response(
+            message="Permission denied",
+            status_code=403
+        )
 
     success, error = delete_job(job_id)
 
@@ -348,6 +381,10 @@ def remove_job(job_id):
     methods=["POST"]
 )
 @jwt_required()
+@roles_required([
+    "STUDENT",
+    "FREELANCER"
+])
 def apply_job():
 
     applicant_id = get_jwt_identity()
@@ -450,6 +487,15 @@ def my_applications():
 @jwt_required()
 def list_job_applications(job_id):
 
+    current_user = get_jwt_identity()
+
+    if not is_job_owner(current_user, job_id):
+
+        return error_response(
+            message="Permission denied",
+            status_code=403
+        )
+
     applications = get_job_applications(job_id)
 
     return success_response(
@@ -476,9 +522,19 @@ def list_job_applications(job_id):
     methods=["PUT"]
 )
 @jwt_required()
-def change_application_status(
-    application_id
-):
+def change_application_status(application_id):
+
+    current_user = get_jwt_identity()
+
+    if not is_application_owner(
+        current_user,
+        application_id
+    ):
+
+        return error_response(
+            message="Permission denied",
+            status_code=403
+        )
 
     data = request.get_json()
 

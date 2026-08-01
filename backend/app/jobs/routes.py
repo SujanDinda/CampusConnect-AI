@@ -21,7 +21,11 @@ from app.jobs.services import (
     get_job_by_id,
     update_job,
     delete_job,
-    apply_for_job
+    apply_for_job,
+    get_my_applications,
+    get_job_applications,
+    update_application_status,
+    withdraw_application
 )
 
 from app.utils.api_response import (
@@ -394,4 +398,147 @@ def apply_job():
         },
 
         status_code=201
+    )
+
+
+@jobs_bp.route(
+    "/applications/me",
+    methods=["GET"]
+)
+@jwt_required()
+def my_applications():
+
+    applicant_id = get_jwt_identity()
+
+    applications = get_my_applications(
+        applicant_id
+    )
+
+    return success_response(
+
+        message="Applications fetched successfully",
+
+        data=[
+
+            {
+
+                "application_id": app.id,
+
+                "job_id": app.job.id,
+
+                "job_title": app.job.title,
+
+                "company": app.job.company.name,
+
+                "status": app.status,
+
+                "applied_at": app.created_at
+
+            }
+
+            for app in applications
+
+        ]
+
+    )
+
+
+@jobs_bp.route(
+    "/<int:job_id>/applications",
+    methods=["GET"]
+)
+@jwt_required()
+def list_job_applications(job_id):
+
+    applications = get_job_applications(job_id)
+
+    return success_response(
+
+        message="Applicants fetched successfully",
+
+        data=[
+            {
+                "application_id": app.id,
+                "applicant_id": app.applicant.id,
+                "email": app.applicant.email,
+                "status": app.status,
+                "cover_letter": app.cover_letter,
+                "resume_url": app.resume_url,
+                "applied_at": app.created_at
+            }
+            for app in applications
+        ]
+    )
+
+
+@jobs_bp.route(
+    "/applications/<int:application_id>/status",
+    methods=["PUT"]
+)
+@jwt_required()
+def change_application_status(
+    application_id
+):
+
+    data = request.get_json()
+
+    status = data.get("status")
+
+    if not status:
+
+        return error_response(
+            message="Status is required",
+            status_code=400
+        )
+
+    application, error = update_application_status(
+        application_id,
+        status
+    )
+
+    if error:
+
+        return error_response(
+            message=error,
+            status_code=404
+        )
+
+    return success_response(
+
+        message="Application status updated successfully",
+
+        data={
+
+            "application_id": application.id,
+
+            "status": application.status
+
+        }
+
+    )
+
+
+@jobs_bp.route(
+    "/applications/<int:application_id>",
+    methods=["DELETE"]
+)
+@jwt_required()
+def withdraw_job_application(application_id):
+
+    applicant_id = get_jwt_identity()
+
+    success, error = withdraw_application(
+        application_id,
+        applicant_id
+    )
+
+    if error:
+
+        return error_response(
+            message=error,
+            status_code=404
+        )
+
+    return success_response(
+        message="Application withdrawn successfully"
     )

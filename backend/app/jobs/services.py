@@ -238,3 +238,75 @@ def apply_for_job(applicant_id, data):
     db.session.commit()
 
     return application, None
+
+
+# ==========================
+# Get My Applications
+# ==========================
+
+def get_my_applications(applicant_id):
+
+    return (
+        JobApplication.query
+        .filter_by(applicant_id=applicant_id)
+        .all()
+    )
+
+
+# ==========================
+# Get Applicants for a Job
+# ==========================
+
+def get_job_applications(job_id):
+
+    return (
+        JobApplication.query
+        .filter_by(job_id=job_id)
+        .all()
+    )
+
+
+# ==========================
+# Update Application Status
+# ==========================
+
+def update_application_status(
+    application_id,
+    status
+):
+
+    application = JobApplication.query.get(
+        application_id
+    )
+
+    if not application:
+        return None, "Application not found"
+
+    application.status = status
+
+    db.session.commit()
+
+    return application, None
+
+
+# ==========================
+# Withdraw Application
+# ==========================
+
+def withdraw_application(
+    application_id,
+    applicant_id
+):
+
+    application = JobApplication.query.filter_by(
+        id=application_id,
+        applicant_id=applicant_id
+    ).first()
+
+    if not application:
+        return False, "Application not found"
+
+    db.session.delete(application)
+    db.session.commit()
+
+    return True, None

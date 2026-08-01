@@ -8,3 +8,4 @@ from app.models.company import Company
 from app.models.job import Job
 from app.models.job_skill import job_skills
 from app.models.job_category import JobCategory
+from app.models.job_application import JobApplication

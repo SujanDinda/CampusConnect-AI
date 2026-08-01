@@ -1,15 +1,16 @@
 from flask import request
 
+from app.jobs import jobs_bp
+
 from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity
 )
 
-from app.jobs import jobs_bp
-
 from app.jobs.schemas import (
     validate_job_data,
-    validate_company_data
+    validate_company_data,
+    validate_job_application_data
 )
 
 from app.jobs.services import (
@@ -19,7 +20,8 @@ from app.jobs.services import (
     get_all_jobs,
     get_job_by_id,
     update_job,
-    delete_job
+    delete_job,
+    apply_for_job
 )
 
 from app.utils.api_response import (
@@ -334,4 +336,62 @@ def remove_job(job_id):
 
     return success_response(
         message="Job deleted successfully"
+    )
+
+
+@jobs_bp.route(
+    "/apply",
+    methods=["POST"]
+)
+@jwt_required()
+def apply_job():
+
+    applicant_id = get_jwt_identity()
+
+    data = request.get_json()
+
+    if not data:
+
+        return error_response(
+            message="Request body is required",
+            status_code=400
+        )
+
+    errors = validate_job_application_data(data)
+
+    if errors:
+
+        return error_response(
+            message="Validation failed",
+            errors=errors,
+            status_code=400
+        )
+
+    application, error = apply_for_job(
+        applicant_id,
+        data
+    )
+
+    if error:
+
+        return error_response(
+            message=error,
+            status_code=400
+        )
+
+    return success_response(
+
+        message="Application submitted successfully",
+
+        data={
+
+            "application_id": application.id,
+
+            "job_id": application.job_id,
+
+            "status": application.status
+
+        },
+
+        status_code=201
     )

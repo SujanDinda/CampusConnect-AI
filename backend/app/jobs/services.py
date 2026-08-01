@@ -4,7 +4,7 @@ from app.models.job import Job
 from app.models.company import Company
 from app.models.job_category import JobCategory
 
-
+from app.models.job_application import JobApplication
 
 # ==========================
 # Create Job
@@ -198,3 +198,43 @@ def delete_job(job_id):
     db.session.commit()
 
     return True, None
+
+
+# ==========================
+# Apply Job
+# ==========================
+
+def apply_for_job(applicant_id, data):
+
+    job = Job.query.filter_by(
+        id=data["job_id"],
+        is_active=True
+    ).first()
+
+    if not job:
+        return None, "Job not found"
+
+    existing = JobApplication.query.filter_by(
+        job_id=data["job_id"],
+        applicant_id=applicant_id
+    ).first()
+
+    if existing:
+        return None, "You have already applied"
+
+    application = JobApplication(
+
+        job_id=data["job_id"],
+
+        applicant_id=applicant_id,
+
+        cover_letter=data.get("cover_letter"),
+
+        resume_url=data.get("resume_url")
+
+    )
+
+    db.session.add(application)
+    db.session.commit()
+
+    return application, None

@@ -86,3 +86,22 @@ def validate_company_data(data):
         )
 
     return errors
+
+
+ALLOWED_APPLICATION_STATUS = [
+    "Pending",
+    "Reviewed",
+    "Shortlisted",
+    "Rejected",
+    "Accepted"
+]
+
+
+def validate_job_application_data(data):
+
+    errors = {}
+
+    if not data.get("job_id"):
+        errors["job_id"] = "Job ID is required"
+
+    return errors

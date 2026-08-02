@@ -6,6 +6,8 @@ from app.models.job_category import JobCategory
 
 from app.models.job_application import JobApplication
 
+from sqlalchemy import or_
+
 # ==========================
 # Create Job
 # ==========================
@@ -131,12 +133,79 @@ def create_company(owner_id, data):
 # Get All Jobs
 # ==========================
 
-def get_all_jobs():
+def get_all_jobs(
+    search=None,
+    location=None,
+    job_type=None,
+    work_mode=None,
+    page=1,
+    per_page=10,
+    sort="newest"
+):
 
-    return Job.query.filter_by(
+    query = Job.query.filter_by(
         is_active=True
-    ).all()
+    )
 
+    if search:
+
+        query = query.filter(
+
+            or_(
+
+                Job.title.ilike(f"%{search}%"),
+
+                Job.description.ilike(f"%{search}%"),
+
+                Job.location.ilike(f"%{search}%")
+
+            )
+
+        )
+
+    if location:
+
+        query = query.filter(
+            Job.location.ilike(f"%{location}%")
+        )
+
+    if job_type:
+
+        query = query.filter(
+            Job.job_type == job_type
+        )
+
+    if work_mode:
+
+        query = query.filter(
+            Job.work_mode == work_mode
+        )
+
+    if sort == "newest":
+        query = query.order_by(
+            Job.created_at.desc()
+        )
+
+    elif sort == "oldest":
+        query = query.order_by(
+            Job.created_at.asc()
+        )
+
+    elif sort == "salary_low":
+        query = query.order_by(
+            Job.salary_min.asc()
+        )
+
+    elif sort == "salary_high":
+        query = query.order_by(
+            Job.salary_max.desc()
+        )
+
+    return query.paginate(
+        page = page,
+        per_page = per_page,
+        error_out = False
+    )
 
 # ==========================
 # Get Job By ID

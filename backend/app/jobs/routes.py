@@ -199,39 +199,68 @@ def create_company_route():
 )
 def list_jobs():
 
-    jobs = get_all_jobs()
+    search = request.args.get("search")
+    location = request.args.get("location")
+    job_type = request.args.get("job_type")
+    work_mode = request.args.get("work_mode")
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+
+    sort = request.args.get(
+        "sort",
+        "newest"
+    )
+
+    jobs = get_all_jobs(
+        search=search,
+        location=location,
+        job_type=job_type,
+        work_mode=work_mode,
+        page=page,
+        per_page=per_page,
+        sort=sort
+    )
 
     return success_response(
 
         message="Jobs fetched successfully",
 
-        data=[
+        data={
 
-            {
+            "jobs": [
 
-                "id": job.id,
+                {
 
-                "title": job.title,
+                    "id": job.id,
 
-                "company": job.company.name,
+                    "title": job.title,
 
-                "category": job.category.name,
+                    "company": job.company.name,
 
-                "location": job.location,
+                    "category": job.category.name,
 
-                "job_type": job.job_type,
+                    "location": job.location,
 
-                "work_mode": job.work_mode,
+                    "job_type": job.job_type,
 
-                "salary_min": job.salary_min,
+                    "work_mode": job.work_mode,
 
-                "salary_max": job.salary_max
+                    "salary_min": job.salary_min,
 
+                    "salary_max": job.salary_max
+                }
+
+                for job in jobs.items
+
+            ],
+            "pagination": {
+                "page": jobs.page,
+                "per_page": jobs.per_page,
+                "total_pages": jobs.pages,
+                "total_records": jobs.total
             }
-
-            for job in jobs
-
-        ]
+        }
 
     )
 

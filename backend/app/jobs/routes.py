@@ -203,6 +203,10 @@ def list_jobs():
     location = request.args.get("location")
     job_type = request.args.get("job_type")
     work_mode = request.args.get("work_mode")
+    company_id = request.args.get("company_id", type=int)
+    category_id = request.args.get("category_id", type=int)
+    salary_min = request.args.get("salary_min", type=int)
+    salary_max = request.args.get("salary_max", type=int)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
@@ -217,6 +221,10 @@ def list_jobs():
         location=location,
         job_type=job_type,
         work_mode=work_mode,
+        company_id=company_id,
+        category_id=category_id,
+        salary_min=salary_min,
+        salary_max=salary_max,
         page=page,
         per_page=per_page,
         sort=sort

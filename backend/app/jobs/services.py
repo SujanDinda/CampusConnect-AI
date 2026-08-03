@@ -138,9 +138,13 @@ def get_all_jobs(
     location=None,
     job_type=None,
     work_mode=None,
+    company_id=None,
+    category_id=None,
+    salary_min=None,
+    salary_max=None,
     page=1,
     per_page=10,
-    sort="newest"
+    sort="newest",
 ):
 
     query = Job.query.filter_by(
@@ -179,6 +183,25 @@ def get_all_jobs(
 
         query = query.filter(
             Job.work_mode == work_mode
+        )
+
+    if company_id:
+        query = query.filter(
+            Job.company_id == company_id
+        )
+
+    if category_id:
+        query = query.filter(
+            Job.category_id == category_id
+        )
+
+    if salary_min is not None:
+        query = query.filter(
+            Job.salary_min >= salary_min
+        )
+    if salary_max is not None:
+        query = query.filter(
+            Job.salary_max <= salary_max
         )
 
     if sort == "newest":

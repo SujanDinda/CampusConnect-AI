@@ -31,6 +31,9 @@ from app.utils.error_handlers import (
 from app.jobs import jobs_bp
 import app.jobs.routes
 
+import app.resumes.routes
+from app.resumes import resume_bp
+
 
 def create_app():
 
@@ -67,6 +70,11 @@ def create_app():
 
     app.register_blueprint(
         jobs_bp
+    )
+
+    app.register_blueprint(
+        resume_bp,
+        url_prefix="/api/v1/resumes"
     )
 
     register_error_handlers(app)

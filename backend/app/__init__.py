@@ -34,6 +34,7 @@ import app.jobs.routes
 import app.resumes.routes
 from app.resumes import resume_bp
 
+from app.ai.routes import ai_bp
 
 def create_app():
 
@@ -75,6 +76,11 @@ def create_app():
     app.register_blueprint(
         resume_bp,
         url_prefix="/api/v1/resumes"
+    )
+
+    app.register_blueprint(
+        ai_bp,
+        url_prefix="/api/v1/ai"
     )
 
     register_error_handlers(app)

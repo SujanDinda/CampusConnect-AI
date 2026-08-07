@@ -3,6 +3,8 @@ import spacy
 
 from app.ai.skills import build_unified_skills
 
+from app.ai.scorer import calculate_resume_score
+
 nlp = spacy.load("en_core_web_sm")
 
 def extract_email(text):
@@ -129,6 +131,9 @@ def extract_resume_data(text):
     }
 
     resume_data["unified_skills"] = build_unified_skills(
+        resume_data
+    )
+    resume_data["resume_score"] = calculate_resume_score(
         resume_data
     )
     return resume_data

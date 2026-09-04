@@ -55,6 +55,12 @@ class Skill(db.Model):
         cascade="all, delete-orphan"
     )
 
+    jobs = db.relationship(
+        "Job",
+        secondary="job_skills",
+        back_populates="required_skills"
+    )
+
 
 class UserSkill(db.Model):
 

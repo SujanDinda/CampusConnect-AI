@@ -95,13 +95,6 @@ def extract_skills(text):
 def extract_resume_data(text):
 
     sections = split_resume_sections(text)
-    print(sections.keys())
-    print(
-        sections.get(
-            "TECHNICAL SKILLS",
-            []
-        )
-    )
 
     resume_data = {
 

@@ -90,7 +90,7 @@ class Job(BaseModel):
     required_skills = db.relationship(
         "Skill",
         secondary=job_skills,
-        backref="jobs"
+        back_populates="jobs"
     )
 
     category = db.relationship(

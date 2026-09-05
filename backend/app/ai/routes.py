@@ -85,7 +85,8 @@ def recommend_jobs():
     user_id = get_jwt_identity()
 
     data, error = recommend_jobs_for_resume(
-        user_id
+        user_id,
+        min_score=70
     )
 
     if error:

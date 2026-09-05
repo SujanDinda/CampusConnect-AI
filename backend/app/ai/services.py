@@ -66,7 +66,10 @@ def match_latest_resume_with_job(user_id, job_id):
     return result, None
 
 
-def recommend_jobs_for_resume(user_id):
+def recommend_jobs_for_resume(
+    user_id,
+    min_score=0
+):
 
     # -------------------------
     # Get latest resume
@@ -128,13 +131,15 @@ def recommend_jobs_for_resume(user_id):
             required_skills
         )
 
-        recommendations.append({
-            "job_id": job.id,
-            "job_title": job.title,
-            "match_score": match_result["match_score"],
-            "matching_skills": match_result["matching_skills"],
-            "missing_skills": match_result["missing_skills"]
-        })
+        if match_result["match_score"] >= min_score:
+
+            recommendations.append({
+                "job_id": job.id,
+                "job_title": job.title,
+                "match_score": match_result["match_score"],
+                "matching_skills": match_result["matching_skills"],
+                "missing_skills": match_result["missing_skills"]
+            })
 
     # -------------------------
     # Sort by match score

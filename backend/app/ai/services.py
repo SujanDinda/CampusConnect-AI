@@ -6,7 +6,8 @@ from app.ai.extractor import extract_resume_data
 from app.models.job import Job
 from app.ai.matcher import (
     match_resume_with_job,
-    calculate_job_match
+    calculate_job_match,
+    calculate_weighted_job_match
 )
 
 
@@ -126,9 +127,10 @@ def recommend_jobs_for_resume(
             if skill.is_active
         ]
 
-        match_result = calculate_job_match(
+        match_result = calculate_weighted_job_match(
             resume_data,
-            required_skills
+            required_skills,
+            job.experience_required
         )
 
         if match_result["match_score"] >= min_score:

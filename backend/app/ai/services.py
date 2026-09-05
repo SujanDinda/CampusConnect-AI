@@ -136,6 +136,19 @@ def recommend_jobs_for_resume(
             recommendations.append({
                 "job_id": job.id,
                 "job_title": job.title,
+                "description": job.description,
+                "location": job.location,
+                "job_type": job.job_type,
+                "work_mode": job.work_mode,
+                "salary_min": job.salary_min,
+                "salary_max": job.salary_max,
+                "experience_required": job.experience_required,
+                "vacancies": job.vacancies,
+                "application_deadline": (
+                    job.application_deadline.isoformat()
+                    if job.application_deadline
+                    else None
+                ),
                 "match_score": match_result["match_score"],
                 "matching_skills": match_result["matching_skills"],
                 "missing_skills": match_result["missing_skills"]

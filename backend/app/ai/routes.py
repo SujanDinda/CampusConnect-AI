@@ -7,8 +7,10 @@ from flask_jwt_extended import (
 
 from app.ai.services import (
     parse_latest_resume,
-    match_latest_resume_with_job
+    match_latest_resume_with_job,
+    recommend_jobs_for_resume
 )
+
 from app.utils.api_response import (
     success_response,
     error_response
@@ -69,5 +71,30 @@ def match_job(job_id):
 
     return success_response(
         message="Resume matched successfully",
+        data=data
+    )
+
+
+@ai_bp.route(
+    "/jobs/recommend",
+    methods=["POST"]
+)
+@jwt_required()
+def recommend_jobs():
+
+    user_id = get_jwt_identity()
+
+    data, error = recommend_jobs_for_resume(
+        user_id
+    )
+
+    if error:
+        return error_response(
+            message=error,
+            status_code=404
+        )
+
+    return success_response(
+        message="Jobs recommended successfully",
         data=data
     )

@@ -36,6 +36,8 @@ from app.resumes import resume_bp
 
 from app.ai.routes import ai_bp
 
+from app.contracts.routes import contract_bp
+
 def create_app():
 
     app = Flask(__name__)
@@ -82,6 +84,8 @@ def create_app():
         ai_bp,
         url_prefix="/api/v1/ai"
     )
+
+    app.register_blueprint(contract_bp)
 
     register_error_handlers(app)
 

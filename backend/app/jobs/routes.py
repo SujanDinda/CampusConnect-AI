@@ -547,6 +547,10 @@ def list_job_applications(job_id):
                 "status": app.status,
                 "cover_letter": app.cover_letter,
                 "resume_url": app.resume_url,
+                "proposed_amount": float(app.proposed_amount)
+                    if app.proposed_amount is not None
+                    else None,
+                "delivery_days": app.delivery_days,
                 "applied_at": app.created_at
             }
             for app in applications

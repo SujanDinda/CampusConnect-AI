@@ -104,4 +104,28 @@ def validate_job_application_data(data):
     if not data.get("job_id"):
         errors["job_id"] = "Job ID is required"
 
+    proposed_amount = data.get("proposed_amount")
+
+    if proposed_amount is not None:
+        if not isinstance(proposed_amount, (int, float)):
+            errors["proposed_amount"] = (
+                "Proposed amount must be a number"
+            )
+        elif proposed_amount <= 0:
+            errors["proposed_amount"] = (
+                "Proposed amount must be greater than 0"
+            )
+
+    delivery_days = data.get("delivery_days")
+
+    if delivery_days is not None:
+        if not isinstance(delivery_days, int):
+            errors["delivery_days"] = (
+                "Delivery days must be an integer"
+            )
+        elif delivery_days <= 0:
+            errors["delivery_days"] = (
+                "Delivery days must be greater than 0"
+            )
+
     return errors

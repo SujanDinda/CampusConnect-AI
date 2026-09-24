@@ -33,6 +33,16 @@ class JobApplication(BaseModel):
         nullable=True
     )
 
+    proposed_amount = db.Column(
+        db.Numeric(10, 2),
+        nullable=True
+    )
+
+    delivery_days = db.Column(
+        db.Integer,
+        nullable=True
+    )
+
     status = db.Column(
         db.String(30),
         default="Pending"

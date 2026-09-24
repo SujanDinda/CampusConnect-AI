@@ -35,27 +35,18 @@ def has_any_role(user_id, role_names):
 
 
 def is_job_owner(user_id, job_id):
-    """
-    Check whether the current user owns the job.
-    """
-
     job = Job.query.get(job_id)
 
     if not job:
         return False
 
-    return job.company.owner_id == user_id
+    return job.company.owner_id == int(user_id)
 
 
 def is_application_owner(user_id, application_id):
-    """
-    Check whether the current user owns
-    the job related to this application.
-    """
-
     application = JobApplication.query.get(application_id)
 
     if not application:
         return False
 
-    return application.job.company.owner_id == user_id
+    return application.job.company.owner_id == int(user_id)

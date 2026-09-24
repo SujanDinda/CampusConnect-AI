@@ -1,11 +1,9 @@
 import re
-import spacy
 
 from app.ai.skills import build_unified_skills
 
 from app.ai.scorer import calculate_resume_score
 
-nlp = spacy.load("en_core_web_sm")
 
 def extract_email(text):
 
@@ -160,13 +158,6 @@ def extract_name(text):
             and not any(char.isdigit() for char in line)
         ):
             return line
-
-    doc = nlp(text)
-
-    for entity in doc.ents:
-
-        if entity.label_ == "PERSON":
-            return entity.text
 
     return None
 

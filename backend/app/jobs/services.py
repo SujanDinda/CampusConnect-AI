@@ -322,7 +322,11 @@ def apply_for_job(applicant_id, data):
 
         cover_letter=data.get("cover_letter"),
 
-        resume_url=data.get("resume_url")
+        resume_url=data.get("resume_url"),
+
+        proposed_amount=data.get("proposed_amount"),
+
+        delivery_days=data.get("delivery_days")
 
     )
 

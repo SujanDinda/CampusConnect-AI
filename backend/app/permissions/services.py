@@ -49,4 +49,5 @@ def is_application_owner(user_id, application_id):
     if not application:
         return False
 
-    return application.job.company.owner_id == int(user_id)
+    result = application.job.company.owner_id == int(user_id)
+    return result

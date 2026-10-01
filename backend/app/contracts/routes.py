@@ -1,10 +1,15 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from app.contracts.schemas import validate_contract_data
+from app.contracts.schemas import (
+    validate_contract_data,
+    validate_contract_status_data
+)
+
 from app.contracts.services import (
     create_contract,
-    get_contract
+    get_contract,
+    update_contract_status
 )
 
 from app.permissions.services import has_role
@@ -116,5 +121,56 @@ def get_contract_details(contract_id):
             "status": contract.status
         },
         message="Contract retrieved successfully",
+        status_code=200
+    )
+
+
+@contract_bp.route("/<int:contract_id>/status", methods=["PUT"])
+@jwt_required()
+def update_contract_status_route(contract_id):
+
+    current_user = get_jwt_identity()
+
+    # Only CLIENT can update contract status
+    if not has_role(
+        current_user,
+        "CLIENT"
+    ):
+        return error_response(
+            "Permission denied",
+            status_code=403
+        )
+
+    data = request.get_json() or {}
+
+    errors = validate_contract_status_data(data)
+
+    if errors:
+        return error_response(
+            "Validation failed",
+            errors=errors,
+            status_code=400
+        )
+
+    contract, error = update_contract_status(
+        contract_id=contract_id,
+        client_id=current_user,
+        status=data["status"]
+    )
+
+    if error:
+        return error_response(
+            error,
+            status_code=404
+            if error == "Contract not found"
+            else 403
+        )
+
+    return success_response(
+        data={
+            "contract_id": contract.id,
+            "status": contract.status
+        },
+        message="Contract status updated successfully",
         status_code=200
     )

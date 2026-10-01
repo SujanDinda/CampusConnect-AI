@@ -46,3 +46,20 @@ def get_contract(contract_id):
         return None, "Contract not found"
 
     return contract, None
+
+
+def update_contract_status(contract_id, client_id, status):
+    contract = Contract.query.get(contract_id)
+
+    if not contract:
+        return None, "Contract not found"
+
+    # Only the client who owns the contract can update its status
+    if contract.client_id != int(client_id):
+        return None, "Permission denied"
+
+    contract.status = status
+
+    db.session.commit()
+
+    return contract, None

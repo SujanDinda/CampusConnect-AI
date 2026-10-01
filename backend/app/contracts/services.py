@@ -38,3 +38,11 @@ def create_contract(application_id, client_id):
     db.session.commit()
 
     return contract, None
+
+def get_contract(contract_id):
+    contract = Contract.query.get(contract_id)
+
+    if not contract:
+        return None, "Contract not found"
+
+    return contract, None

@@ -2,7 +2,10 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.contracts.schemas import validate_contract_data
-from app.contracts.services import create_contract
+from app.contracts.services import (
+    create_contract,
+    get_contract
+)
 
 from app.permissions.services import has_role
 
@@ -69,4 +72,49 @@ def create_new_contract():
         },
         message="Contract created successfully",
         status_code=201
+    )
+
+
+@contract_bp.route("/<int:contract_id>", methods=["GET"])
+@jwt_required()
+def get_contract_details(contract_id):
+
+    current_user = get_jwt_identity()
+
+    contract, error = get_contract(
+        contract_id
+    )
+
+    if error:
+        return error_response(
+            error,
+            status_code=404
+        )
+
+    # Only client or freelancer involved in the contract can view it
+    if (
+        contract.client_id != int(current_user)
+        and contract.freelancer_id != int(current_user)
+    ):
+        return error_response(
+            "Permission denied",
+            status_code=403
+        )
+
+    return success_response(
+        data={
+            "contract_id": contract.id,
+            "job_id": contract.job_id,
+            "application_id": contract.application_id,
+            "client_id": contract.client_id,
+            "freelancer_id": contract.freelancer_id,
+            "agreed_amount": float(
+                contract.agreed_amount
+            ),
+            "start_date": contract.start_date,
+            "end_date": contract.end_date,
+            "status": contract.status
+        },
+        message="Contract retrieved successfully",
+        status_code=200
     )

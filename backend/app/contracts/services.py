@@ -63,3 +63,26 @@ def update_contract_status(contract_id, client_id, status):
     db.session.commit()
 
     return contract, None
+
+
+def update_contract_dates(
+    contract_id,
+    client_id,
+    start_date,
+    end_date
+):
+    contract = Contract.query.get(contract_id)
+
+    if not contract:
+        return None, "Contract not found"
+
+    # Only the client who owns the contract can update dates
+    if contract.client_id != int(client_id):
+        return None, "Permission denied"
+
+    contract.start_date = start_date
+    contract.end_date = end_date
+
+    db.session.commit()
+
+    return contract, None

@@ -53,3 +53,21 @@ def validate_milestone_data(data):
             )
 
     return errors
+
+
+def validate_milestone_status_data(data):
+    errors = {}
+
+    status = data.get("status")
+
+    if not status:
+        errors["status"] = (
+            "Milestone status is required"
+        )
+
+    elif status not in ALLOWED_MILESTONE_STATUS:
+        errors["status"] = (
+            "Invalid milestone status"
+        )
+
+    return errors

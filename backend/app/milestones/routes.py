@@ -2,12 +2,14 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.milestones.schemas import (
-    validate_milestone_data
+    validate_milestone_data,
+    validate_milestone_status_data
 )
 
 from app.milestones.services import (
     create_milestone,
-    get_milestone
+    get_milestone,
+    update_milestone_status
 )
 
 from app.permissions.services import has_role
@@ -128,5 +130,54 @@ def get_milestone_details(milestone_id):
             "status": milestone.status
         },
         message="Milestone retrieved successfully",
+        status_code=200
+    )
+
+
+
+@milestone_bp.route(
+    "/<int:milestone_id>/status",
+    methods=["PUT"]
+)
+@jwt_required()
+def update_milestone_status_route(
+    milestone_id
+):
+
+    current_user = get_jwt_identity()
+
+    data = request.get_json() or {}
+
+    errors = validate_milestone_status_data(
+        data
+    )
+
+    if errors:
+        return error_response(
+            "Validation failed",
+            errors=errors,
+            status_code=400
+        )
+
+    milestone, error = update_milestone_status(
+        milestone_id=milestone_id,
+        user_id=current_user,
+        status=data["status"]
+    )
+
+    if error:
+        return error_response(
+            error,
+            status_code=404
+            if error == "Milestone not found"
+            else 403
+        )
+
+    return success_response(
+        data={
+            "milestone_id": milestone.id,
+            "status": milestone.status
+        },
+        message="Milestone status updated successfully",
         status_code=200
     )

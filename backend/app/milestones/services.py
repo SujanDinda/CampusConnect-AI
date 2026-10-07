@@ -54,3 +54,29 @@ def get_milestone(milestone_id, user_id):
         return None, "Permission denied"
 
     return milestone, None
+
+
+def update_milestone_status(
+    milestone_id,
+    user_id,
+    status
+):
+    milestone = Milestone.query.get(
+        milestone_id
+    )
+
+    if not milestone:
+        return None, "Milestone not found"
+
+    contract = milestone.contract
+
+    # Only client who owns the contract
+    # can update milestone status
+    if contract.client_id != int(user_id):
+        return None, "Permission denied"
+
+    milestone.status = status
+
+    db.session.commit()
+
+    return milestone, None

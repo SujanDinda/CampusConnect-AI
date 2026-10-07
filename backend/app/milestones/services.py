@@ -37,3 +37,20 @@ def create_milestone(
     db.session.commit()
 
     return milestone, None
+
+
+def get_milestone(milestone_id, user_id):
+    milestone = Milestone.query.get(milestone_id)
+
+    if not milestone:
+        return None, "Milestone not found"
+
+    contract = milestone.contract
+
+    if (
+        contract.client_id != int(user_id)
+        and contract.freelancer_id != int(user_id)
+    ):
+        return None, "Permission denied"
+
+    return milestone, None

@@ -70,9 +70,45 @@ def update_milestone_status(
 
     contract = milestone.contract
 
-    # Only client who owns the contract
-    # can update milestone status
-    if contract.client_id != int(user_id):
+    current_status = milestone.status
+
+    # Client workflow
+    if contract.client_id == int(user_id):
+
+        allowed_transitions = {
+            "Pending": ["In Progress"],
+            "Submitted": ["Approved", "Rejected"],
+            "Approved": ["Completed"],
+            "Rejected": ["In Progress"]
+        }
+
+        allowed_statuses = allowed_transitions.get(
+            current_status,
+            []
+        )
+
+        if status not in allowed_statuses:
+            return None, (
+                f"Cannot change milestone status "
+                f"from {current_status} to {status}"
+            )
+
+    # Freelancer workflow
+    elif contract.freelancer_id == int(user_id):
+
+        if current_status != "In Progress":
+            return None, (
+                "Freelancer can submit only "
+                "an In Progress milestone"
+            )
+
+        if status != "Submitted":
+            return None, (
+                "Freelancer can only change "
+                "In Progress to Submitted"
+            )
+
+    else:
         return None, "Permission denied"
 
     milestone.status = status

@@ -38,6 +38,8 @@ from app.ai.routes import ai_bp
 
 from app.contracts.routes import contract_bp
 
+from app.milestones.routes import milestone_bp
+
 def create_app():
 
     app = Flask(__name__)
@@ -86,6 +88,8 @@ def create_app():
     )
 
     app.register_blueprint(contract_bp)
+
+    app.register_blueprint(milestone_bp)
 
     register_error_handlers(app)
 

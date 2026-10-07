@@ -10,3 +10,4 @@ from app.models.job_skill import job_skills
 from app.models.job_category import JobCategory
 from app.models.job_application import JobApplication
 from app.models.contract import Contract
+from app.models.milestone import Milestone

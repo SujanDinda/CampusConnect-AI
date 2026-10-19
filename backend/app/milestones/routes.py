@@ -9,7 +9,8 @@ from app.milestones.schemas import (
 from app.milestones.services import (
     create_milestone,
     get_milestone,
-    update_milestone_status
+    update_milestone_status,
+    get_contract_milestones
 )
 
 from app.permissions.services import has_role
@@ -130,6 +131,58 @@ def get_milestone_details(milestone_id):
             "status": milestone.status
         },
         message="Milestone retrieved successfully",
+        status_code=200
+    )
+
+
+
+@milestone_bp.route(
+    "/contract/<int:contract_id>",
+    methods=["GET"]
+)
+@jwt_required()
+def get_contract_milestones_route(
+    contract_id
+):
+
+    current_user = get_jwt_identity()
+
+    milestones, error = get_contract_milestones(
+        contract_id,
+        current_user
+    )
+
+    if error:
+        return error_response(
+            error,
+            status_code=404
+            if error == "Contract not found"
+            else 403
+        )
+
+    data = []
+
+    for milestone in milestones:
+
+        data.append({
+            "milestone_id": milestone.id,
+            "contract_id": milestone.contract_id,
+            "title": milestone.title,
+            "description": milestone.description,
+            "amount": float(
+                milestone.amount
+            ),
+            "due_date": str(
+                milestone.due_date
+            )
+            if milestone.due_date
+            else None,
+            "status": milestone.status
+        })
+
+    return success_response(
+        data=data,
+        message="Milestones retrieved successfully",
         status_code=200
     )
 

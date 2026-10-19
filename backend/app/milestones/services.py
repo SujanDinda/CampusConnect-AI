@@ -116,3 +116,32 @@ def update_milestone_status(
     db.session.commit()
 
     return milestone, None
+
+
+
+def get_contract_milestones(
+    contract_id,
+    user_id
+):
+    contract = Contract.query.get(
+        contract_id
+    )
+
+    if not contract:
+        return None, "Contract not found"
+
+    # Only the client or freelancer
+    # belonging to this contract can view milestones
+    if (
+        contract.client_id != int(user_id)
+        and contract.freelancer_id != int(user_id)
+    ):
+        return None, "Permission denied"
+
+    milestones = Milestone.query.filter_by(
+        contract_id=contract_id
+    ).order_by(
+        Milestone.id.asc()
+    ).all()
+
+    return milestones, None

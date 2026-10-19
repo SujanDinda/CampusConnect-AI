@@ -145,3 +145,34 @@ def get_contract_milestones(
     ).all()
 
     return milestones, None
+
+
+
+def delete_milestone(
+    milestone_id,
+    user_id
+):
+    milestone = Milestone.query.get(
+        milestone_id
+    )
+
+    if not milestone:
+        return None, "Milestone not found"
+
+    contract = milestone.contract
+
+    # Only the client who owns the contract
+    # can delete a milestone
+    if contract.client_id != int(user_id):
+        return None, "Permission denied"
+
+    # Completed milestones cannot be deleted
+    if milestone.status == "Completed":
+        return None, (
+            "Completed milestone cannot be deleted"
+        )
+
+    db.session.delete(milestone)
+    db.session.commit()
+
+    return milestone, None

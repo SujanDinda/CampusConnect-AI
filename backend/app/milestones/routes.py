@@ -10,7 +10,8 @@ from app.milestones.services import (
     create_milestone,
     get_milestone,
     update_milestone_status,
-    get_contract_milestones
+    get_contract_milestones,
+    delete_milestone
 )
 
 from app.permissions.services import has_role
@@ -183,6 +184,40 @@ def get_contract_milestones_route(
     return success_response(
         data=data,
         message="Milestones retrieved successfully",
+        status_code=200
+    )
+
+
+
+@milestone_bp.route(
+    "/<int:milestone_id>",
+    methods=["DELETE"]
+)
+@jwt_required()
+def delete_milestone_route(
+    milestone_id
+):
+
+    current_user = get_jwt_identity()
+
+    milestone, error = delete_milestone(
+        milestone_id=milestone_id,
+        user_id=current_user
+    )
+
+    if error:
+        return error_response(
+            error,
+            status_code=404
+            if error == "Milestone not found"
+            else 403
+        )
+
+    return success_response(
+        data={
+            "milestone_id": milestone.id
+        },
+        message="Milestone deleted successfully",
         status_code=200
     )
 
